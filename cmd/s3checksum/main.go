@@ -46,7 +46,7 @@ func main() {
 					},
 					&cli.Int64Flag{
 						Name:        "chunksize",
-						Value:       0,
+						Value:       64,
 						Usage:       "--chunksize=10 will create 10MB chunks",
 						Destination: &chunksize,
 					},
@@ -71,6 +71,9 @@ func main() {
 					if threads < 0 {
 						log.Fatalf("threads must be a positive value. Input value: %d", threads)
 					}
+					if file == "" {
+						return fmt.Errorf("--file flag is required")
+					}
 					mpf, err := s3checksum.NewMultipartFile(s3checksum.MultipartFileOpts{
 						FilePath:         file,
 						ManifestFilePath: manifestFile,
@@ -88,7 +91,7 @@ func main() {
 					for _, part := range info.PartList {
 						fmt.Printf("Part: %05d\t\t%s\n", part.PartNumber, part.Checksum)
 					}
-					fmt.Printf("Amazon S3 Checksum:\t%s-%d\n", info.Checksum, len(info.PartList))
+					fmt.Printf("Amazon S3 SHA256:\t%s-%d\n", info.Checksum, len(info.PartList))
 					fmt.Printf("Amazon S3 Etag:\t%x-%d\n", info.Etag, len(info.PartList))
 					return nil
 				},
@@ -127,7 +130,7 @@ func main() {
 					},
 					&cli.Int64Flag{
 						Name:        "chunksize",
-						Value:       0,
+						Value:       64,
 						Usage:       "--chunksize=10 will create 10MB chunks",
 						Destination: &chunksize,
 					},
@@ -147,6 +150,10 @@ func main() {
 				Name:  "upload",
 				Usage: "upload",
 				Action: func(c *cli.Context) error {
+
+					if file == "" {
+						return fmt.Errorf("--file flag is required")
+					}
 
 					return s3checksum.Upload(context.Background(), &s3checksum.UploadOptions{
 						Bucket:       bucket,
