@@ -99,7 +99,7 @@ func Upload(ctx context.Context, opts *UploadOptions) error {
 			log.Printf("failed writing manifest at: %s", opts.ManifestFile)
 		}
 	}
-	fmt.Printf("Amazon S3 Etag:\t%s\n", *uploadOutput.ChecksumSHA256)
+	fmt.Printf("Amazon S3 SHA256:\t%s\n", *uploadOutput.ChecksumSHA256)
 
 	etagstr := fmt.Sprintf("%x", etag)
 	if len(parts) > 0 {
