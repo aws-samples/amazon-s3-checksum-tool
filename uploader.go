@@ -25,6 +25,7 @@ type UploadOptions struct {
 	PartSize     int64
 	Region       string
 	AWSProfile   string
+	UsePathStyle bool
 }
 
 func Upload(ctx context.Context, opts *UploadOptions) error {
@@ -39,7 +40,10 @@ func Upload(ctx context.Context, opts *UploadOptions) error {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	client := s3.NewFromConfig(cfg)
+
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = opts.UsePathStyle
+	})
 
 	f, err := os.Open(opts.LocalFile)
 	if err != nil {
@@ -75,7 +79,7 @@ func Upload(ctx context.Context, opts *UploadOptions) error {
 			log.Printf("unable to decode checksum")
 		}
 		pi := &PartInfo{
-			PartNumber: p.PartNumber,
+			PartNumber: *p.PartNumber,
 			Checksum:   ByteSlice(c),
 			Algorithm:  "sha256",
 		}

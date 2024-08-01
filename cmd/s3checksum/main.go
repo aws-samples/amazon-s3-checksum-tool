@@ -25,6 +25,7 @@ func main() {
 	var printHex bool
 	var region string
 	var awsProfile string
+	var usePathStyle bool
 
 	//
 	app := &cli.App{
@@ -49,6 +50,12 @@ func main() {
 						Value:       64,
 						Usage:       "--chunksize=10 will create 10MB chunks",
 						Destination: &chunksize,
+					},
+					&cli.BoolFlag{
+						Name:        "use-path-style",
+						Value:       false,
+						Usage:       "--use-path-style changes to path-style (old) insteaad of virtual-hosted style (new) s3 hostnames",
+						Destination: &usePathStyle,
 					},
 					&cli.IntFlag{
 						Name:        "threads",
@@ -134,6 +141,12 @@ func main() {
 						Usage:       "--chunksize=10 will create 10MB chunks",
 						Destination: &chunksize,
 					},
+					&cli.BoolFlag{
+						Name:        "use-path-style",
+						Value:       false,
+						Usage:       "--use-path-style changes to path-style (old) insteaad of virtual-hosted style (new) s3 hostnames",
+						Destination: &usePathStyle,
+					},
 					&cli.StringFlag{
 						Name:        "region",
 						Value:       "us-west-2",
@@ -164,6 +177,7 @@ func main() {
 						PartSize:     chunksize * 1024 * 1024,
 						Region:       region,
 						AWSProfile:   awsProfile,
+						UsePathStyle: usePathStyle,
 					})
 				},
 			},
