@@ -124,17 +124,19 @@ func (m *MultipartFile) CalculateChecksumForPart(ctx context.Context, partNum in
 	if err != nil {
 		return nil, err
 	}
-	limitedReader := io.LimitedReader{R: f, N: size}
 
 	// Get from the buffer pool so we're not re-allocating
 	buffer := m.bufferPool.Get()
 	defer m.bufferPool.Put(buffer)
 	poolData := buffer.([]byte)
-	n, err := limitedReader.Read(poolData)
+	poolData = poolData[0:size]
+
+	n, err := io.ReadFull(f, poolData)
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
 	if int64(n) != size {
+		err = fmt.Errorf("limitedReader returned %d bytes instead of the expected %d bytes", n, size)
 		return nil, err
 	}
 	data := poolData[:n]
